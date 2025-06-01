@@ -49,4 +49,28 @@ No way to test things as I can only use our actual verisaes that we need to comp
 If I get one login, i'll have them all. The different clients are just different logins that are used on the same site.
 Lets start by capturing a request in dev tools.
 
+![Screenshot_2025-06-02_00-22-05](https://github.com/user-attachments/assets/f421f8f0-3452-4072-b34d-c672facca90a)
 
+
+As we can see, fairly standard headers.
+Two cookies, the JSESSIONID (important) and the _enid (doesnt seem to matter).
+And the body of the request:
+
+![Screenshot_2025-06-02_00-25-38](https://github.com/user-attachments/assets/00269fc5-b57f-403d-85cb-6cde648480f8)
+
+
+Ok so theres a CSRF that we will need. The username and password go in the login and password fields towards that bottom.
+So lets look and the login page and search for the CSRF:
+
+![Screenshot_2025-06-02_00-29-05](https://github.com/user-attachments/assets/2750a4fd-24ce-4249-92b9-db03c81e12b1)
+
+Easy peasy, all we have to do is grab it from the login page and put it in our POST.
+
+What headers do we need?
+How do they work?
+How does the body work?
+
+We do have a slight issue though, a successful login results in a redirect, a 302 response.
+Power automate hates redirects for some mysterious reason. Even when successful we get a 200, but luckily we do get a Set-Cookie response header with a lovely authenticated JSESSIONID.
+With this JSESSIONID we can request that page we were supposed to be redirected to and hurray! We clearly have managed to log in!
+We will be keeping this cookie close to hand from here on out.
