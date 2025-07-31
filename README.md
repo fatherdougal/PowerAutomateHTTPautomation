@@ -189,6 +189,20 @@ In my experience fails are around 1% at the moment.
 ## Login Timeout
 This seems to happen randomly. I don't have a particularly good explanation for this other than it occurs when you are logged in in browser at the same time and the server freaks out.
 
+This is the reponse when that happens.
+
+
+"<!-- $Header: session_timeout.html -->
+<html>
+
+
+
+<body onload="top.location.replace('/DataNett/action/'+'showLogin?kiosk=kiosk2/summary_login.html&pcc=pcc/login.html')"></body>
+
+</html>"
+
+
+
 ## Notes Updated, whats next
 
 Now I go back to the table and check the current status of the work order, expecting either 'Service incomplete' or 'Pend Site Review'. These work queue items are now marked as 'Processed'.
