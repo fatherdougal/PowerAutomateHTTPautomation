@@ -99,6 +99,15 @@ In my case this search was also a www-form-urlencoded. The thing to be careful o
 
 I then crop the table to get the results. Cropping is a bit of a pain but this gave me the link to the work order I was looking for as well as the details of the current work order status.
 
+There are some slight issues here, what do we do when we cant find the work order? Typos from the helpdesk team often crop up. 
+Having some advanced error handling here could be useful. 
+
+Also occasionally due to on site engieers having WOs recalled we get jobs that dont have the expected status at the start.
+I expect the work order to currently be 'Assigned' but it can also be 'Pend Accept' if the helpdesk hasnt accepted it yet, 'Service incomplete' if an engineer has had a job recalled, or even 'Service Complete' and a few other statuses if the job is already complete in Verisae but has been recalled to us on our local systems. 
+I don't deal with these issues much currently but it is a future consideration.
+
+
+
 ## multipart/form-data
 
 So far so good, everything has worked out quite nicely. Here is where we hit an issue. One of the posts I want to automate is a multipart/form-data.
@@ -149,7 +158,51 @@ And in paste (press CTRL V) our edited action.
 Now, posting our form, we get {"action": "start_work", "tech_id": "22142086860"} as a reponse! No more errors.
 
 
-There were no other major difficulties in automating my actions, other than regularly having newlines that got added into fields and made things fail.
 When in doubt, check the code view for newlines. When copy and pasting, power automate love invisible newlines.
 
 Also power automate hates quotation marks in headers (sometimes). These never bothered me too much as I tended to just delete the header. Most of them weren't neccisary.
+
+
+## Updating the work order notes
+
+At work we always either pause the work order or complete the work order, however sometimes we pause it for ourselves and other times we pause it for an on site engineer. In this case we can mark this WO as completed for ourselves.
+
+I do some login in my original SQL statement to decide what type of work order this is.
+
+Now we just have to encode our job notes, and update the work order.
+Encoding the job notes could be complicated, currently I just URI encode everything but it seems like it will be important that certain characters are replaced. It seems like the javascript of the actaul page is probably a good place to look at all the rules.
+When we are successful putting our notes in we get 'Success' (but base64 encoded) and when we fail for any reason we get..... 'fail' (similarly encoded as ZmFpbA==)
+
+
+Why do these fails happen? Some of them seem to be explainable:
+- Notes are too long. Limit is 500 characters so I limit the notes to this length.
+- Notes have illegal characters. I have replaced some (&,%) but I am unsure what other ones cause issues.
+- Maybe some kind of timeout or race condition?
+
+I'm still working on making this reliable and also having some ability to retry.
+
+When we get a fail like this, my flow will mark this work queue item as 'Generic Exception' and message the engineer who did this WO in order to alert them that they should do this one themselves. 
+In my experience fails are around 1% at the moment.
+
+
+
+## Login Timeout
+This seems to happen randomly. I don't have a particularly good explanation for this other than it occurs when you are logged in in browser at the same time and the server freaks out.
+
+## Notes Updated, whats next
+
+Now I go back to the table and check the current status of the work order, expecting either 'Service incomplete' or 'Pend Site Review'. These work queue items are now marked as 'Processed'.
+This then triggers a teams message to a channel with no tag of the engineer that lets people know the WOs current status.
+
+If anything unexpected has occured and the current status doesnt match what is expected, a message is sent with a notification/teams tag that lets the engineer know.
+This is also used when the work order isnt found. 
+
+Work orders that are not complete on our end will be put back to 'On Hold' and if the notes are at any point modified, the verisae will be updated again.
+
+
+## SLA status
+We have a four hour SLA to start out WO. I could be doing something with this but I currently do not.
+This is something I will be bringing up.
+
+
+
