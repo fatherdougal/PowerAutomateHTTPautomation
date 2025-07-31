@@ -167,7 +167,7 @@ Also power automate hates quotation marks in headers (sometimes). These never bo
 
 At work we always either pause the work order or complete the work order, however sometimes we pause it for ourselves and other times we pause it for an on site engineer. In this case we can mark this WO as completed for ourselves.
 
-I do some login in my original SQL statement to decide what type of work order this is.
+I do some logic in my original SQL statement to decide what type of work order this is.
 
 Now we just have to encode our job notes, and update the work order.
 Encoding the job notes could be complicated, currently I just URI encode everything but it seems like it will be important that certain characters are replaced. It seems like the javascript of the actaul page is probably a good place to look at all the rules.
@@ -187,20 +187,11 @@ In my experience fails are around 1% at the moment.
 
 
 ## Login Timeout
-This seems to happen randomly. I don't have a particularly good explanation for this other than it occurs when you are logged in in browser at the same time and the server freaks out.
+This seems to happen randomly. I don't have a particularly good explanation for this other than it maybe occurs when you are logged in in browser at the same time and the server freaks out.
 
 This is the reponse when that happens.
 
-
-"<!-- $Header: session_timeout.html -->
-<html>
-
-
-
-<body onload="top.location.replace('/DataNett/action/'+'showLogin?kiosk=kiosk2/summary_login.html&pcc=pcc/login.html')"></body>
-
-</html>"
-
+!-- $Header: session_timeout.html --
 
 
 ## Notes Updated, whats next
